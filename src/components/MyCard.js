@@ -1,132 +1,86 @@
-import React, { useState } from "react";
+import { Button, Card, CardContent, Typography,CardActions, Grid, Dialog, DialogTitle, DialogContentText, DialogActions } from "@material-ui/core";
+import React, { Fragment, useState } from "react";
+import { getMatchDetails } from "../api/api";
+import { Height } from "@material-ui/icons";
+const MyCard = ({match})=>{
+  const [detail,setDetail] = useState({})
+  const [open,setOpen] = useState(false)
+  const handleClick = (id)=>{
+    getMatchDetails(id).then(data=>{
+      console.log("Match Data:",data);
+      setDetail(data);
+      handleOpen()
+    }).catch((error)=>console.log("Error:",error))
+  }
 
-import { makeStyles } from "@material-ui/core/styles";
+  const handleClose = ()=>{
+    setOpen(false)
+  }
+  const handleOpen =()=>{
+    setOpen(true)
+  }
 
-import {
-  Button,
-  Card,
-  CardActions,
-  CardContent,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  Grid,
-  Typography,
-} from "@material-ui/core";
-import { getMatchDetail } from "../api/api";
-
-const MyCard = ({ match }) => {
-  const [detail, setDatail] = useState({});
-  const [open, setOpen] = useState(false);
-
-  const getMatchCard = () => (
-    <div>
-      <Card
-        style={{
-          background: match.matchStarted ? "#e2e2e2" : "",
-          marginTop: 15,
-        }}
-      >
+  const getMatchCard=()=>{
+    return (
+      <Card style={{marginTop:15}}>
         <CardContent>
-          <Grid container justify="center" alignItems="center" spacing={4}>
+          <Grid container alignItems="center" justify="center" spacing={4}>
+            <Grid item><Typography variant="h5">{match['teams'][0]}</Typography></Grid>
             <Grid item>
-              <Typography variant="h5">{match["team-1"]}</Typography>
+              <img style={{width:60}} src={require("../img/vs.png")} alt=""></img>
             </Grid>
-            <Grid item>
-              <img
-                style={{ width: 85 }}
-                src={require("../img/vs.png")}
-                alt=""
-              />
-            </Grid>
-            <Grid item>
-              <Typography variant="h5">{match["team-2"]}</Typography>
-            </Grid>
+            <Grid item><Typography variant="h5">{match['teams'][1]}</Typography></Grid>
           </Grid>
         </CardContent>
-
         <CardActions>
-          <Grid container justify="center">
-            <Button
-              onClick={() => {
-                showDetailBtnClicked(match["unique_id"]);
-              }}
-              variant="outlined"
-              color="secondary"
-            >
-              Show Detail
+          <Grid container justify="center" spacing={4}>
+            <Grid item>
+            <Button onClick={()=>{
+              handleClick(match['id'])
+            }} item variant="contained" color="primary">
+              Show detail
             </Button>
-            <Button
-              style={{ marginLeft: 5 }}
-              variant="outlined"
-              color="primary"
-            >
-              Starting time {new Date(match.dateTimeGMT).toLocaleString()}
+            </Grid>
+            <Grid item>
+            <Button item variant="contained" color="primary">
+              Start Time {new Date(match['dateTimeGMT']).toLocaleString()}
             </Button>
+            </Grid>
+            
           </Grid>
         </CardActions>
       </Card>
-    </div>
-  );
-
-  const showDetailBtnClicked = (id) => {
-    getMatchDetail(id)
-      .then((data) => {
-        console.log(data);
-        setDatail(data);
-        handleClickOpen();
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  };
-
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-  };
-
-  return (
-    <>
-      {match.type == "Twenty20" ? getMatchCard() : ""}
-      <Dialog
-        open={open}
-        onClose={handleClose}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle id="alert-dialog-title">{"Match Detail..."}</DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            <Typography>{detail.stat}</Typography>
-            <Typography>
-              Match
-              <span style={{ fontStyle: "italic", fontWeight: "bold" }}>
-                {detail.matchStarted ? "Started" : "Still not started"}
-              </span>
-            </Typography>
-            <Typography>
-              Score
-              <span style={{ fontStyle: "italic", fontWeight: "bold" }}>
-                {" "}
-                {detail.score}
-              </span>
-            </Typography>
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose} color="primary" autoFocus>
-            Close
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </>
-  );
-};
+    )
+  }
+  const getDialog = ()=>
+  {
+    return( <Dialog open={open} onClose={handleClose}>
+      <DialogTitle id="alert-dialog-title">{"Match Details ..."}</DialogTitle>
+      <DialogContentText id="alert-dialog-description">
+        <Typography>
+          {detail['status']}
+        </Typography>
+        <Typography>
+          Match<span style={{fontStyle:"italic",fontWeight:"bold"}}>
+          {detail['matchStarted']?"Started":"Not Started yet"}
+          </span>
+        </Typography>
+        <Typography>
+          Score
+          <span style={{fontStyle:"italic",fontWeight:"bold"}}>
+          {detail['score']}
+          </span>
+        </Typography>
+      </DialogContentText>
+      <DialogActions>
+        <Button onClick={handleClose} color="primary" autoFocus>Close</Button>
+      </DialogActions>
+    </Dialog>);
+  }
+  return <Fragment>
+    {getMatchCard()}
+    {getDialog()}
+  </Fragment>
+}
 
 export default MyCard;

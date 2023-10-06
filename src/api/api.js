@@ -1,22 +1,13 @@
-const API_KEY = "qZnM0O90ToIjBiq9GvT9382";
 
-export const getMatches = () => {
-  const url = `https://cricapi.com/api/matches?apikey=${API_KEY}`;
-  console.log("URL", url);
-  return fetch(url)
-    .then((response) => {
-      return response.json();
-    })
-    .catch((error) => {
-      console.log("ERROR ", error);
-    });
+export const getMatches = async () => {
+  const url = 'https://api.cricapi.com/v1/currentMatches?apikey=6e8c422d-4f3b-4d66-a7b9-ce5f480c5070&offset=0';
+
+  return await fetch(url).then((response)=>response.json())
+  .catch((error)=>console.log("Error:",error))
 };
 
-//get the score of the cuurent match
-
-export const getMatchDetail = (id) => {
-  const url = `https://cricapi.com/api/cricketScore?unique_id=${id}&apikey=${API_KEY}`;
-  return fetch(url)
-    .then((response) => response.json())
-    .catch((error) => console.log(error));
-};
+export const getMatchDetails= async(id)=>{
+  const url = `https://api.cricapi.com/v1/match_info?apikey=6e8c422d-4f3b-4d66-a7b9-ce5f480c5070&id=${id}`
+  return await fetch(url).then((response)=>response.json())
+  .catch((error)=>console.log("Error:",error))
+} 
